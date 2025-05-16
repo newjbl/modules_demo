@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://bltajbfusfvpv"]
+[gd_scene load_steps=8 format=3 uid="uid://bltajbfusfvpv"]
 
 [ext_resource type="Texture2D" uid="uid://b5f0hnk3assl1" path="res://mesh_merge/texture/CC_Base_Body__0__Base Color.jpg" id="1_113of"]
-[ext_resource type="Script" uid="uid://ihq1wt6ldnjw" path="res://mesh_merge/mesh_merge.gd" id="1_w016c"]
+[ext_resource type="Script" uid="uid://n5a4xj4xst2i" path="res://mesh_merge/mesh_merge_ds.gd" id="1_w016c"]
 [ext_resource type="Texture2D" uid="uid://d2e4e27t5jvsy" path="res://mesh_merge/texture/CC_Base_Body__1__Base Color.jpg" id="2_w016c"]
+[ext_resource type="ArrayMesh" path="res://mesh_merge/combined_assets/combined_mesh.tres" id="4_s8rtv"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_s8rtv"]
 
@@ -12,12 +13,10 @@ albedo_texture = ExtResource("1_113of")
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wdc0k"]
 albedo_texture = ExtResource("2_w016c")
 
-[node name="mesh_merge" type="Node3D" node_paths=PackedStringArray("mesh_1", "mesh_2")]
+[node name="mesh_merge" type="Node3D"]
 script = ExtResource("1_w016c")
-mesh_1 = NodePath("mesh_1")
-mesh_2 = NodePath("mesh_2")
-tex_1 = ExtResource("1_113of")
-tex_2 = ExtResource("2_w016c")
+texture_1 = ExtResource("1_113of")
+texture_2 = ExtResource("2_w016c")
 
 [node name="mesh_1" type="MeshInstance3D" parent="."]
 mesh = SubResource("BoxMesh_s8rtv")
@@ -35,3 +34,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.4201)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.83643, 5.2522)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = ExtResource("4_s8rtv")

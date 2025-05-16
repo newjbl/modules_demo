@@ -6,7 +6,7 @@ extends Node3D
 @export var tex_2: Texture2D
 
 const ATLAS_SIZE = 2048
-const SAVE_PATH = "user://mesh_merge/combined_assets/"
+const SAVE_PATH = "res://mesh_merge/combined_assets/"
 
 func _ready():
 	var combined_data = combine_meshes()
@@ -67,34 +67,55 @@ func convert_to_array_mesh(original_mesh: Mesh) -> ArrayMesh:
 func process_converted_mesh(st: SurfaceTool, array_mesh: ArrayMesh, uv_scale: float, uv_offset: Vector2):
 	var mdt = MeshDataTool.new()
 	for surface_idx in array_mesh.get_surface_count():
-		mdt.create_from_surface(array_mesh, surface_idx)
-		
+		# 创建临时SurfaceTool确保法线存在
+		var temp_st = SurfaceTool.new()
+		temp_st.create_from(array_mesh, surface_idx)
+
+		# 检查原始表面是否无法线
+		var original_arrays = array_mesh.surface_get_arrays(surface_idx)
+		if original_arrays[Mesh.ARRAY_NORMAL] == null:
+			temp_st.generate_normals()  # 自动生成法线
+
+		# 提交临时网格
+		var temp_mesh = temp_st.commit()
+
+		# 从临时网格创建MeshDataTool（确保带法线）
+		mdt.create_from_surface(temp_mesh, 0)
+
 		# 调整UV坐标
 		for i in range(mdt.get_vertex_count()):
 			var uv = mdt.get_vertex_uv(i)
 			uv.x = uv.x * uv_scale + uv_offset.x
 			uv.y = uv.y * uv_scale + uv_offset.y
 			mdt.set_vertex_uv(i, uv)
-		
-		# 写入顶点数据
+
+		# 写入顶点数据（修复循环语法）
 		for face_idx in range(mdt.get_face_count()):
-			for vertex_idx in 3:
+			for vertex_idx in range(3):  # 修复：使用 range(3) 而不是直接 3
 				var vidx = mdt.get_face_vertex(face_idx, vertex_idx)
 				st.add_vertex(mdt.get_vertex(vidx))
-				st.set_normal(mdt.get_vertex_normal(vidx))
+				st.set_normal(mdt.get_vertex_normal(vidx))  # 现在保证有法线
 				st.set_uv(mdt.get_vertex_uv(vidx))
 				if mdt.get_vertex_color(vidx) != Color.WHITE:
 					st.set_color(mdt.get_vertex_color(vidx))
+
+		mdt.clear()  # 清理当前表面数据
 
 func create_combined_texture(t1: Texture2D, t2: Texture2D) -> ImageTexture:
 	var image = Image.create(ATLAS_SIZE, ATLAS_SIZE, false, Image.FORMAT_RGBA8)
 	
 	# 处理第一个贴图
 	var img1 = t1.get_image()
+	if img1.is_compressed():
+		img1.decompress()
+	img1.convert(Image.FORMAT_RGBA8)
 	image.blit_rect(img1, Rect2i(0, 0, ATLAS_SIZE, ATLAS_SIZE), Vector2i.ZERO)
 	
 	# 处理第二个贴图
 	var img2 = t2.get_image()
+	if img2.is_compressed():
+		img2.decompress()
+	img2.convert(Image.FORMAT_RGBA8)
 	image.blit_rect(img2, Rect2i(0, 0, ATLAS_SIZE, ATLAS_SIZE), Vector2i(ATLAS_SIZE, 0))
 	
 	return ImageTexture.create_from_image(image)
