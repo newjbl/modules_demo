@@ -45,12 +45,14 @@ func merge_meshes() -> ArrayMesh:
 	return combined
 
 func process_mesh(mesh_node: MeshInstance3D, st: SurfaceTool, x_offset: float):
-	if not mesh_node or not mesh_node.mesh is ArrayMesh:
+	var array_mesh = ArrayMesh.new()
+	array_mesh.add_surface_from_arrays(
+		Mesh.PRIMITIVE_TRIANGLES,
+		mesh_node.mesh.get_mesh_arrays())
+	var mesh = array_mesh
+	if not mesh_node or not mesh is ArrayMesh:
 		return
-	
-	var mesh = mesh_node.mesh as ArrayMesh
 	var transform = mesh_node.global_transform
-	
 	for surface_idx in mesh.get_surface_count():
 		var arrays = mesh.surface_get_arrays(surface_idx)
 		var verts = arrays[Mesh.ARRAY_VERTEX]

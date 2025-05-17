@@ -13,17 +13,21 @@ albedo_texture = ExtResource("1_113of")
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wdc0k"]
 albedo_texture = ExtResource("2_w016c")
 
-[node name="mesh_merge" type="Node3D"]
+[node name="mesh_merge" type="Node3D" node_paths=PackedStringArray("mesh_1", "mesh_2")]
 script = ExtResource("1_w016c")
+mesh_1 = NodePath("mesh_1")
+mesh_2 = NodePath("mesh_2")
 texture_1 = ExtResource("1_113of")
 texture_2 = ExtResource("2_w016c")
 
 [node name="mesh_1" type="MeshInstance3D" parent="."]
+visible = false
 mesh = SubResource("BoxMesh_s8rtv")
 surface_material_override/0 = SubResource("StandardMaterial3D_2wds3")
 
 [node name="mesh_2" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.739832, 0.390614, -0.583709)
+visible = false
 mesh = SubResource("BoxMesh_s8rtv")
 surface_material_override/0 = SubResource("StandardMaterial3D_wdc0k")
 
